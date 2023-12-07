@@ -6,9 +6,11 @@ import (
 
 type Syncmap interface {
 	Create(key, value any) error
-	Read(key any) (any, error)
 	Update(key, value any) error
 	Delete(key any) error
+
+	Get(key any) (any, error)
+	GetMulti(keys []any) (map[any]any, error)
 }
 
 func NewSyncmap() Syncmap {
@@ -32,17 +34,6 @@ func (impl *syncmapImpl) Create(key, value any) error {
 	return nil
 }
 
-func (impl *syncmapImpl) Read(key any) (any, error) {
-	if key == nil {
-		return nil, ErrInvalidArgument
-	}
-	value, ok := impl.syncmap.Load(key)
-	if !ok {
-		return nil, ErrNotFound
-	}
-	return value, nil
-}
-
 func (impl *syncmapImpl) Update(key, value any) error {
 	if key == nil || value == nil {
 		return ErrInvalidArgument
@@ -61,4 +52,29 @@ func (impl *syncmapImpl) Delete(key any) error {
 	}
 	impl.syncmap.Delete(key)
 	return nil
+}
+
+func (impl *syncmapImpl) Get(key any) (any, error) {
+	if key == nil {
+		return nil, ErrInvalidArgument
+	}
+	value, ok := impl.syncmap.Load(key)
+	if !ok {
+		return nil, ErrNotFound
+	}
+	return value, nil
+}
+
+func (impl *syncmapImpl) GetMulti(keys []any) (map[any]any, error) {
+	if keys == nil {
+		return nil, ErrInvalidArgument
+	}
+	res := make(map[any]any)
+	for _, key := range keys {
+		value, err := impl.Get(key)
+		if err == nil {
+			res[key] = value
+		}
+	}
+	return res, nil
 }
