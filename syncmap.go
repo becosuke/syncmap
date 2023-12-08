@@ -38,10 +38,6 @@ func (impl *syncmapImpl) Update(key, value any) error {
 	if key == nil || value == nil {
 		return ErrInvalidArgument
 	}
-	_, ok := impl.syncmap.Load(key)
-	if !ok {
-		return ErrNotFound
-	}
 	impl.syncmap.Store(key, value)
 	return nil
 }

@@ -295,11 +295,11 @@ func Test_syncmapImpl_Create(t *testing.T) {
 			impl := &syncmapImpl{
 				syncmap: tt.fields.syncmap,
 			}
-			if err := impl.Create(tt.args.key, tt.args.value); err != nil {
-				if tt.wantErr {
-					return
-				}
+			if err := impl.Create(tt.args.key, tt.args.value); (err != nil) != tt.wantErr {
 				t.Errorf("Create() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if tt.wantErr {
 				return
 			}
 			value, ok := tt.fields.syncmap.Load(tt.args.key)
@@ -347,7 +347,7 @@ func Test_syncmapImpl_Update(t *testing.T) {
 		func() testCase {
 			syncmap := &sync.Map{}
 			return testCase{
-				name: "not found",
+				name: "not found caused no error",
 				fields: fields{
 					syncmap: syncmap,
 				},
@@ -355,7 +355,7 @@ func Test_syncmapImpl_Update(t *testing.T) {
 					key:   1,
 					value: "test2",
 				},
-				wantErr: true,
+				wantErr: false,
 			}
 		}(),
 	}
@@ -364,11 +364,11 @@ func Test_syncmapImpl_Update(t *testing.T) {
 			impl := &syncmapImpl{
 				syncmap: tt.fields.syncmap,
 			}
-			if err := impl.Update(tt.args.key, tt.args.value); err != nil {
-				if tt.wantErr {
-					return
-				}
+			if err := impl.Update(tt.args.key, tt.args.value); (err != nil) != tt.wantErr {
 				t.Errorf("Update() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if tt.wantErr {
 				return
 			}
 			value, ok := tt.fields.syncmap.Load(tt.args.key)
